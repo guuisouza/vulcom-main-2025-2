@@ -1,12 +1,19 @@
 import prisma from '../database/client.js'
 import jwt from 'jsonwebtoken'
+import bcrypt from 'bcrypt'
 
 const controller = {}     // Objeto vazio
 
 controller.create = async function(req, res) {
   try {
+    
+    if (req.body.password) {
+      
+      const salt = 12
+      req.body.password = await bcrypt.hash(req.body.password, salt)
+    }
 
-    await prisma.user.create({ data: req.body })
+    await prisma.user.create({data: req.body})
 
     // HTTP 201: Created
     res.status(201).end()
@@ -55,6 +62,12 @@ controller.retrieveOne = async function(req, res) {
 
 controller.update = async function(req, res) {
   try {
+
+    if(req.body.password) {
+      
+      const salt = 12
+      req.body.password = await bcrypt.hash(req.body.password, salt)
+    }
 
     const result = await prisma.user.update({
       where: { id: Number(req.params.id) },
