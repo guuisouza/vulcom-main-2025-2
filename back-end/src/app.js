@@ -5,12 +5,12 @@ dotenv.config() // Carrega as variáveis de ambiente do arquivo .env
 import express, { json, urlencoded } from 'express'
 import cookieParser from 'cookie-parser'
 import logger from 'morgan'
-import auth from './middleware/auth.js'
 
 const app = express()
 
 app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS.split(',')
+  origin: process.env.ALLOWED_ORIGINS.split(','),
+  credentials: true
 }))
 app.use(logger('dev'))
 app.use(json())
