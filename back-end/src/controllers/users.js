@@ -185,10 +185,9 @@ controller.login = async function(req, res) {
       })
 
 
-      // Retorna o token e o usuário autenticado com
+      // Retorna APENAS o usuário autenticado com
       // HTTP 200: OK (implícito)
-      res.send({token, user})
-
+      res.send({user})
   }
   catch(error) {
     console.error(error)
@@ -197,6 +196,14 @@ controller.login = async function(req, res) {
     res.status(500).end()
   }
 }
+
+controller.logout = function(req, res) {
+  // Apaga no front-end o cookie que armazena o token
+  res.clearCookie(process.env.AUTH_COOKIE_NAME)
+  // HTTP 204: No Content
+  res.status(204).end()
+}
+
 
 controller.me = function(req, res) {
   // Retorna as informações do usuário autenticado
