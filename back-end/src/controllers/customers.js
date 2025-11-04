@@ -1,9 +1,20 @@
 import prisma from '../database/client.js'
+import Customer from '../models/Customer.js'
+import { ZodError } from 'zod'
 
 const controller = {}     // Objeto vazio
 
 controller.create = async function(req, res) {
   try {
+    // Sempre que houver um campo que represente uma data,
+    // precisamos garantir sua conversão para o tipo Date
+    // antes de passá-lo ao Zod para validação
+    if(req.body.birth_date) req.body.birth_date = new Date(req.body.birth_date)
+
+
+    // Invoca a validação do modelo do Zod para os dados que
+    // vieram em req.body
+    Customer.parse(req.body)
 
     await prisma.customer.create({ data: req.body })
 
@@ -12,6 +23,10 @@ controller.create = async function(req, res) {
   }
   catch(error) {
     console.error(error)
+
+    // Se for erro de validação do Zod, retorna
+    // HTTP 422: Unprocessable Entity
+    if(error instanceof ZodError) res.status(422).send(error.issues)
 
     // HTTP 500: Internal Server Error
     res.status(500).end()
@@ -64,6 +79,16 @@ controller.retrieveOne = async function(req, res) {
 
 controller.update = async function(req, res) {
   try {
+
+    // Sempre que houver um campo que represente uma data,
+    // precisamos garantir sua conversão para o tipo Date
+    // antes de passá-lo ao Zod para validação
+    if(req.body.birth_date) req.body.birth_date = new Date(req.body.birth_date)
+
+    // Invoca a validação do modelo do Zod para os dados que
+    // vieram em req.body
+    Customer.parse(req.body)
+
     const result = await prisma.customer.update({
       where: { id: Number(req.params.id) },
       data: req.body
@@ -71,6 +96,10 @@ controller.update = async function(req, res) {
 
     // Encontrou e atualizou ~> HTTP 204: No Content
     if(result) res.status(204).end()
+
+    // Erro do Zod ~> HTTP 422: Unprocessable Entity
+    else if(error instanceof ZodError) res.status(422).send(error.issues)
+      
     // Não encontrou (e não atualizou) ~> HTTP 404: Not Found
     else res.status(404).end()
   }
