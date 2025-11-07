@@ -1,5 +1,5 @@
 import React from "react";
-import wordlist from "../data/wordlist";
+import wordlist from "../../data/wordlist";
 import myfetch from "../lib/myfetch";
 
 export default function BruteForce() {

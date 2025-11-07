@@ -14,6 +14,7 @@ import UserForm from "../pages/user/UserForm";
 
 import Login from "../pages/Login";
 
+import AuthGuard from "../routes/AuthGuard";
 import { routes, UserLevel } from "./routes";
 
 export default function AppRoutes() {
