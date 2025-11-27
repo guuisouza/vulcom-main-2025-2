@@ -14,6 +14,14 @@ controller.create = async function(req, res) {
 
     // Invoca a validação do modelo do Zod para os dados que
     // vieram em req.body
+
+    /*
+      Vulnerabilidade: API3:2023 Falha de autenticação a nível de propriedade
+        Esta vulnerabilidade foi evitada no código ao utilizar um esquema de validação (Zod) que define estritamente quais campos e tipos são 
+        aceitos pela API, prevenindo ataques de Atribuição em Massa (Mass Assignment) onde campos indevidos poderiam ser injetados.
+
+        Essa medida de segurança com schemas e zod foi implementada no seguinte dia: (01/11) Término do ataque de força bruta e início da implementação de validação de dados de usuário
+    */
     Customer.parse(req.body)
 
     await prisma.customer.create({ data: req.body })

@@ -41,6 +41,13 @@ controller.retrieveAll = async function(req, res) {
     const result = await prisma.user.findMany({
       // Omite o campo "password" do resultado
       // por questão de segurança
+
+      /*
+        Vulnerabilidade: API3:2023 Falha de autenticação a nível de propriedade
+        Esta vulnerabilidade foi evitada no código ao omitir explicitamente o campo sensível "password" da resposta da API, 
+        prevenindo o vazamento de credenciais.
+        Essa proteção foi implementada no seguinte dia e commit: (08/10) Término da segurança de senhas + segurança de API com token JWT
+    */
       omit: { password: true }
     })
 
@@ -57,6 +64,14 @@ controller.retrieveAll = async function(req, res) {
 
 controller.retrieveOne = async function(req, res) {
   try {
+
+    /*
+      Vulnerabilidade: API1:2023 - Falha de autenticação a nível de objeto
+      Esta vulnerabilidade foi evitada no código ao garantir que um usuário comum só possa visualizar os 
+      seus próprios dados (verificando se o ID do token corresponde ao ID da rota), impedindo o acesso horizontal indevido 
+      a objetos de outros usuários (impedindo que ele acesse os dados de outro usuario apenas trocando o ID na rota por ex).
+      Essa proteção foi implementada no seguinte dia e commit: (22/10) Proteção de rotas no back-end e no front-end
+    */
 
     // Somente usuários administradores ou o próprio usuário
     // autenticado podem acessar este recurso
@@ -118,6 +133,15 @@ controller.update = async function(req, res) {
 
 controller.delete = async function(req, res) {
   
+  /*
+    Vulnerabilidade: API5:2023 Falha de autenticação a nível de função
+    Essa vulnerabilidade foi evitada no código ao verificar explicitamente se o usuário autenticado possui a propriedade 
+    'is_admin' antes de permitir a execução desta função administrativa de exclusão.
+    Essa proteção foi implementada no seguinte dia e commit: (22/10) Proteção de rotas no back-end e no front-end
+    - Obs: Vale ressaltar que foi colocada não só neste endpoint mas sim em todo esse controller, mas estou colocando apenas nesse método
+    para manter organizado e não ficar repetido.
+  */
+
   // Somente usuários administradores podem acessar este recurso
   // HTTP 403: Forbidden
   if(! req?.authUser?.is_admin) {
